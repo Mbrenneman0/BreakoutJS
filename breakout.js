@@ -64,7 +64,7 @@ class Ball
         // New X = Starting X + Distance * cos(Angle in Radians)  
         // New Y = Starting Y + Distance * sin(Angle in Radians)
 
-        let distance = this.velocity*time;
+        let distance = this.velocity*time*canvas.height;
         
         this.x = this.x + distance * Math.cos(radians(this.direction));
         this.y = this.y + distance * Math.sin(radians(this.direction));
@@ -105,7 +105,7 @@ class Paddle
         this.x = x;
         this.y = y;
         this.updateBounds();
-        this.velocity = 300;
+        this.velocity = .8;
     }
 
     drawPaddle()
@@ -120,12 +120,12 @@ class Paddle
     {
         if(leftPressed)
         {
-            this.x = this.x - this.velocity*time;
+            this.x = this.x - this.velocity*time*canvas.height;
             this.updateBounds();
         }
         if(rightPressed)
         {
-            this.x = this.x + this.velocity*time;
+            this.x = this.x + this.velocity*time*canvas.height;
             this.updateBounds();
         }
     }
@@ -234,14 +234,20 @@ class Block
 //// Object Declerations ///////
 ////////////////////////////////
 
-const paddle = new Paddle(60, 5, canvas.width/2, canvas.height-10);
-const ball = new Ball(5, paddle.x, paddle.y-5-paddle.height/2, Directions.SOUTH, 200);
+const paddle = new Paddle(canvas.width/8, canvas.height/60, canvas.width/2, canvas.height-10);
+const ball = new Ball(5, paddle.x, paddle.y-5-paddle.height/2, Directions.SOUTH, .5);
+
 let blockArray = new Array();
-for(let x = 0; x < 8; x++)
+let blockColumns = 15;
+let blockRows = 6;
+let blockWidth = canvas.width/blockColumns;
+let blockHeight = canvas.height/30;
+
+for(let x = 0; x < blockColumns; x++)
 {
-    for(let y = 0; y < 6; y++)
+    for(let y = 0; y < blockRows; y++)
     {
-        blockArray.push(new Block(canvas.width/8, 10, canvas.width/16 + (canvas.width/8)*x, 5 + 10*y, Math.ceil((6-y)/2+2)));
+        blockArray.push(new Block(blockWidth, blockHeight, blockWidth/2 + (blockWidth)*x, blockRows - 1 + blockHeight*y, Math.ceil((6-y)/2+2)));
     }
 }
 addEventListener("keydown", keyDownHandler, false);
