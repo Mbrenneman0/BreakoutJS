@@ -84,6 +84,13 @@ class Ball
 
         this.direction = newDirection;
     }
+
+    resize(scaleX, scaleY){
+        this.radius = this.radius * scaleX;
+        this.x = this.x * scaleX;
+        this.y = this.y * scaleY;
+        this.velocity = this.velocity * scaleY;
+    }
     
 }
 
@@ -144,13 +151,29 @@ class Paddle
         this.right = this.x + this.width/2;
         this.bottom = this.y + this.height/2;
     }
+
+    resize(scaleX, scaleY){
+        this.width = this.width * scaleX;
+        this.height = this.height * scaleY;
+        //
+        console.log(`old y : ${this.y} * ${scaleY} =`);
+        //
+        this.x = this.x * scaleX;
+        this.y = this.y * scaleY;
+        //
+        console.log(`${this.y}`);
+        //
+        this.updateBounds();
+        this.velocity = this.velocity * scaleX;
+    }
+
 }
 
 class Block
 {
     constructor(width, height, x, y, health)
     {
-        this.width = width
+        this.width = width;
         this.height = height;
         this.x = x;
         this.y = y;
@@ -195,6 +218,15 @@ class Block
         this.right = this.x + this.width/2;
         this.bottom = this.y + this.height/2;
     }
+
+    resize(scaleX, scaleY){
+        this.width = this.width * scaleX;
+        this.height = this.height * scaleY;
+        this.x = this.x * scaleX;
+        this.y = this.y * scaleY;
+        this.updateBounds();
+    }
+
 }
 
 
@@ -493,9 +525,23 @@ function keyUpHandler(event)
     }
 }
 
-function resizeHandler(){
-    canvas.width = canvas.clientWidth;
-    canvas.height = canvas.clientHeight;
+function resizeHandler()
+{
+    let oldW = canvas.width;
+    let oldH = canvas.height
 
-    console.log(`resize. new canvas width = ${canvas.width} and new canvas height = ${canvas.height}`);
+    canvas.width = canvas.clientWidth;
+    console.log(`${canvas.width} / ${oldW}`);
+    let transformScaleX = canvas.width/oldW;
+
+    canvas.height = canvas.clientHeight;
+    console.log(`${canvas.height} / ${oldH}`);
+    let transformScaleY = canvas.height/oldH;
+
+    ball.resize(transformScaleX, transformScaleY);
+    paddle.resize(transformScaleX, transformScaleY);
+    for(let iter = 0; iter < blockArray.length; iter++)
+    {
+        blockArray[iter].resize(transformScaleX, transformScaleY);
+    }
 }
