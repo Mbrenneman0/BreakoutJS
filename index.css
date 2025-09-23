@@ -1,11 +1,11 @@
 #gameContainer{
     margin-top: 50px;
-    display: flex;
-    justify-content: center;
+    text-align: center;
 }
 
 #gameCanvas{
-    width: 800px;
-    height: 600px;
+    width: 70%;
+    aspect-ratio: 16/9;
+    margin: 0 auto;
     border: 1px solid black;
 }

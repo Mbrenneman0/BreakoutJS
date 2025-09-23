@@ -6,9 +6,15 @@ console.log("script is loading");
 
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
+
+canvas.width = canvas.clientWidth;
+canvas.height = canvas.clientHeight;
+
 let timestamp = 0, lastTimestamp = 0;
 
 let leftPressed = false, rightPressed = false, spaceBarPressed = false;
+
+console.log(`canvas width = ${canvas.width} and canvas height = ${canvas.height}`); //remove this log after testing
 
 const Directions = {
     NORTH: 270,
@@ -208,6 +214,7 @@ for(let x = 0; x < 8; x++)
 }
 addEventListener("keydown", keyDownHandler, false);
 addEventListener("keyup", keyUpHandler, false);
+addEventListener("resize", resizeHandler, false);
 
 ////////////////////////////////
 /////// Initialization /////////
@@ -484,4 +491,11 @@ function keyUpHandler(event)
             ball.isCaught = false;
         }
     }
+}
+
+function resizeHandler(){
+    canvas.width = canvas.clientWidth;
+    canvas.height = canvas.clientHeight;
+
+    console.log(`resize. new canvas width = ${canvas.width} and new canvas height = ${canvas.height}`);
 }
