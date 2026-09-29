@@ -6,9 +6,15 @@ console.log("script is loading");
 
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
+
+canvas.width = canvas.clientWidth;
+canvas.height = canvas.clientHeight;
+
 let timestamp = 0, lastTimestamp = 0;
 
 let leftPressed = false, rightPressed = false, spaceBarPressed = false;
+
+console.log(`canvas width = ${canvas.width} and canvas height = ${canvas.height}`); //remove this log after testing
 
 const Directions = {
     NORTH: 270,
@@ -58,7 +64,7 @@ class Ball
         // New X = Starting X + Distance * cos(Angle in Radians)  
         // New Y = Starting Y + Distance * sin(Angle in Radians)
 
-        let distance = this.velocity*time;
+        let distance = this.velocity*time*canvas.height;
         
         this.x = this.x + distance * Math.cos(radians(this.direction));
         this.y = this.y + distance * Math.sin(radians(this.direction));
@@ -78,6 +84,13 @@ class Ball
 
         this.direction = newDirection;
     }
+
+    resize(scaleX, scaleY){
+        this.radius = this.radius * scaleX;
+        this.x = this.x * scaleX;
+        this.y = this.y * scaleY;
+        this.velocity = this.velocity * scaleY;
+    }
     
 }
 
@@ -92,7 +105,7 @@ class Paddle
         this.x = x;
         this.y = y;
         this.updateBounds();
-        this.velocity = 300;
+        this.velocity = .8;
     }
 
     drawPaddle()
@@ -107,12 +120,12 @@ class Paddle
     {
         if(leftPressed)
         {
-            this.x = this.x - this.velocity*time;
+            this.x = this.x - this.velocity*time*canvas.height;
             this.updateBounds();
         }
         if(rightPressed)
         {
-            this.x = this.x + this.velocity*time;
+            this.x = this.x + this.velocity*time*canvas.height;
             this.updateBounds();
         }
     }
@@ -138,13 +151,29 @@ class Paddle
         this.right = this.x + this.width/2;
         this.bottom = this.y + this.height/2;
     }
+
+    resize(scaleX, scaleY){
+        this.width = this.width * scaleX;
+        this.height = this.height * scaleY;
+        //
+        console.log(`old y : ${this.y} * ${scaleY} =`);
+        //
+        this.x = this.x * scaleX;
+        this.y = this.y * scaleY;
+        //
+        console.log(`${this.y}`);
+        //
+        this.updateBounds();
+        this.velocity = this.velocity * scaleX;
+    }
+
 }
 
 class Block
 {
     constructor(width, height, x, y, health)
     {
-        this.width = width
+        this.width = width;
         this.height = height;
         this.x = x;
         this.y = y;
@@ -189,6 +218,15 @@ class Block
         this.right = this.x + this.width/2;
         this.bottom = this.y + this.height/2;
     }
+
+    resize(scaleX, scaleY){
+        this.width = this.width * scaleX;
+        this.height = this.height * scaleY;
+        this.x = this.x * scaleX;
+        this.y = this.y * scaleY;
+        this.updateBounds();
+    }
+
 }
 
 
@@ -196,18 +234,25 @@ class Block
 //// Object Declerations ///////
 ////////////////////////////////
 
-const paddle = new Paddle(60, 5, canvas.width/2, canvas.height-10);
-const ball = new Ball(5, paddle.x, paddle.y-5-paddle.height/2, Directions.SOUTH, 200);
+const paddle = new Paddle(canvas.width/8, canvas.height/60, canvas.width/2, canvas.height-10);
+const ball = new Ball(5, paddle.x, paddle.y-5-paddle.height/2, Directions.SOUTH, .5);
+
 let blockArray = new Array();
-for(let x = 0; x < 8; x++)
+let blockColumns = 15;
+let blockRows = 6;
+let blockWidth = canvas.width/blockColumns;
+let blockHeight = canvas.height/30;
+
+for(let x = 0; x < blockColumns; x++)
 {
-    for(let y = 0; y < 6; y++)
+    for(let y = 0; y < blockRows; y++)
     {
-        blockArray.push(new Block(canvas.width/8, 10, canvas.width/16 + (canvas.width/8)*x, 5 + 10*y, Math.ceil((6-y)/2+2)));
+        blockArray.push(new Block(blockWidth, blockHeight, blockWidth/2 + (blockWidth)*x, blockRows - 1 + blockHeight*y, Math.ceil((6-y)/2+2)));
     }
 }
 addEventListener("keydown", keyDownHandler, false);
 addEventListener("keyup", keyUpHandler, false);
+addEventListener("resize", resizeHandler, false);
 
 ////////////////////////////////
 /////// Initialization /////////
@@ -483,5 +528,26 @@ function keyUpHandler(event)
         {
             ball.isCaught = false;
         }
+    }
+}
+
+function resizeHandler()
+{
+    let oldW = canvas.width;
+    let oldH = canvas.height
+
+    canvas.width = canvas.clientWidth;
+    console.log(`${canvas.width} / ${oldW}`);
+    let transformScaleX = canvas.width/oldW;
+
+    canvas.height = canvas.clientHeight;
+    console.log(`${canvas.height} / ${oldH}`);
+    let transformScaleY = canvas.height/oldH;
+
+    ball.resize(transformScaleX, transformScaleY);
+    paddle.resize(transformScaleX, transformScaleY);
+    for(let iter = 0; iter < blockArray.length; iter++)
+    {
+        blockArray[iter].resize(transformScaleX, transformScaleY);
     }
 }
