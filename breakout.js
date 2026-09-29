@@ -229,6 +229,14 @@ class Block
 
 }
 
+/*
+this is a test
+
+for github practice
+
+mr c is pretty cool sometimes i guess
+*/
+
 
 ////////////////////////////////
 //// Object Declerations ///////
@@ -544,10 +552,10 @@ function resizeHandler()
     console.log(`${canvas.height} / ${oldH}`);
     let transformScaleY = canvas.height/oldH;
 
-    ball.resize(transformScaleX, transformScaleY);
-    paddle.resize(transformScaleX, transformScaleY);
+    ball.resize(transformScaleX, transformScaleX);
+    paddle.resize(transformScaleX, transformScaleX);
     for(let iter = 0; iter < blockArray.length; iter++)
     {
-        blockArray[iter].resize(transformScaleX, transformScaleY);
+        blockArray[iter].resize(transformScaleX, transformScaleX);
     }
 }
